@@ -1,12 +1,27 @@
 .vscode
 *__pycache__
+merge_cgc.py
 
 # directories
 cache/
 dataset/
 exp_output/
+test_run_del
+test.txt
 
 # checkpoint paths
 *.npz
 *.png
 *.log
+heihei_del
+nohup.out
+file.txt
+res
+res1
+merge_cgc.py
+*.jpg
+*.pdf
+less
+pretrained/
+samples
+logs

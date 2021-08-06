@@ -27,7 +27,7 @@ def __proc_np_hv(pred):
     """Process Nuclei Prediction with XY Coordinate Map.
 
     Args:
-        pred: prediction output, assuming 
+        pred: prediction output, assuming
               channel 0 contain probability map of nuclei
               channel 1 containing the regressed X-map
               channel 2 containing the regressed Y-map
@@ -35,6 +35,7 @@ def __proc_np_hv(pred):
     """
     pred = np.array(pred, dtype=np.float32)
 
+    #print(pred.shape, 2222)
     blb_raw = pred[..., 0]
     h_dir_raw = pred[..., 1]
     v_dir_raw = pred[..., 2]
@@ -100,10 +101,10 @@ def process(pred_map, nr_types=None, return_centroids=False):
         overlaid_img: img to overlay the predicted instances upon, `None` means no
         type_colour (dict) : `None` to use random, else overlay instances of a type to colour in the dict
         output_dtype: data type of output
-    
+
     Returns:
         pred_inst:     pixel-wise nuclear instance segmentation prediction
-        pred_type_out: pixel-wise nuclear type prediction 
+        pred_type_out: pixel-wise nuclear type prediction
 
     """
     if nr_types is not None:

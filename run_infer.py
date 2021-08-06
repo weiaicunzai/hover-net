@@ -11,11 +11,11 @@ Options:
 
   --gpu=<id>                  GPU list. [default: 0]
   --nr_types=<n>              Number of nuclei types to predict. [default: 0]
-  --type_info_path=<path>     Path to a json define mapping between type id, type name, 
+  --type_info_path=<path>     Path to a json define mapping between type id, type name,
                               and expected overlaid color. [default: '']
 
   --model_path=<path>         Path to saved checkpoint.
-  --model_mode=<mode>         Original HoVer-Net or the reduced version used PanNuke and MoNuSAC, 
+  --model_mode=<mode>         Original HoVer-Net or the reduced version used PanNuke and MoNuSAC,
                               'original' or 'fast'. [default: fast]
   --nr_inference_workers=<n>  Number of workers during inference. [default: 8]
   --nr_post_proc_workers=<n>  Number of workers during post-processing. [default: 16]
@@ -34,13 +34,13 @@ Arguments for processing tiles.
 usage:
     tile (--input_dir=<path>) (--output_dir=<path>) \
          [--draw_dot] [--save_qupath] [--save_raw_map] [--mem_usage=<n>]
-    
+
 options:
    --input_dir=<path>     Path to input data directory. Assumes the files are not nested within directory.
    --output_dir=<path>    Path to output directory..
 
-   --mem_usage=<n>        Declare how much memory (physical + swap) should be used for caching. 
-                          By default it will load as many tiles as possible till reaching the 
+   --mem_usage=<n>        Declare how much memory (physical + swap) should be used for caching.
+                          By default it will load as many tiles as possible till reaching the
                           declared limit. [default: 0.2]
    --draw_dot             To draw nuclei centroid on overlay. [default: False]
    --save_qupath          To optionally output QuPath v0.2.3 compatible format. [default: False]
@@ -55,12 +55,12 @@ usage:
         [--cache_path=<path>] [--input_mask_dir=<path>] \
         [--ambiguous_size=<n>] [--chunk_shape=<n>] [--tile_shape=<n>] \
         [--save_thumb] [--save_mask]
-    
+
 options:
     --input_dir=<path>      Path to input data directory. Assumes the files are not nested within directory.
     --output_dir=<path>     Path to output directory.
     --cache_path=<path>     Path for cache. Should be placed on SSD with at least 100GB. [default: cache]
-    --mask_dir=<path>       Path to directory containing tissue masks. 
+    --mask_dir=<path>       Path to directory containing tissue masks.
                             Should have the same name as corresponding WSIs. [default: '']
 
     --proc_mag=<n>          Magnification level (objective power) used for WSI processing. [default: 40]
@@ -82,7 +82,7 @@ from docopt import docopt
 
 if __name__ == '__main__':
     sub_cli_dict = {'tile' : tile_cli, 'wsi' : wsi_cli}
-    args = docopt(__doc__, help=False, options_first=True, 
+    args = docopt(__doc__, help=False, options_first=True,
                     version='HoVer-Net Pytorch Inference v1.0')
     sub_cmd = args.pop('<command>')
     sub_cmd_args = args.pop('<args>')
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     )
 
     if args['--help'] and sub_cmd is not None:
-        if sub_cmd in sub_cli_dict: 
+        if sub_cmd in sub_cli_dict:
             print(sub_cli_dict[sub_cmd])
         else:
             print(__doc__)
@@ -108,12 +108,13 @@ if __name__ == '__main__':
         exit()
 
     sub_args = docopt(sub_cli_dict[sub_cmd], argv=sub_cmd_args, help=True)
-    
+
     args.pop('--version')
     gpu_list = args.pop('--gpu')
-    os.environ['CUDA_VISIBLE_DEVICES'] = gpu_list
+    #os.environ['CUDA_VISIBLE_DEVICES'] = gpu_list
 
     nr_gpus = torch.cuda.device_count()
+    print(nr_gpus)
     log_info('Detect #GPUS: %d' % nr_gpus)
 
     args = {k.replace('--', '') : v for k, v in args.items()}
@@ -137,6 +138,7 @@ if __name__ == '__main__':
     # ***
     run_args = {
         'batch_size' : int(args['batch_size']) * nr_gpus,
+        #'batch_size' : int(args['batch_size']) * 1,   #baiyu
 
         'nr_inference_workers' : int(args['nr_inference_workers']),
         'nr_post_proc_workers' : int(args['nr_post_proc_workers']),
@@ -175,9 +177,10 @@ if __name__ == '__main__':
             'save_mask'      : sub_args['save_mask'],
         })
     # ***
-    
+
     if sub_cmd == 'tile':
-        from infer.tile import InferManager
+        from infer.tile_by import InferManager
+        #from infer.tile import InferManager
         infer = InferManager(**method_args)
         infer.process_file_list(run_args)
     else:

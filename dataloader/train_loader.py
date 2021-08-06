@@ -25,9 +25,9 @@ from .augs import (
 
 ####
 class FileLoader(torch.utils.data.Dataset):
-    """Data Loader. Loads images from a file list and 
+    """Data Loader. Loads images from a file list and
     performs augmentation with the albumentation library.
-    After augmentation, horizontal and vertical maps are 
+    After augmentation, horizontal and vertical maps are
     generated.
 
     Args:
@@ -35,7 +35,7 @@ class FileLoader(torch.utils.data.Dataset):
         input_shape: shape of the input [h,w] - defined in config.py
         mask_shape: shape of the output [h,w] - defined in config.py
         mode: 'train' or 'valid'
-        
+
     """
 
     # TODO: doc string

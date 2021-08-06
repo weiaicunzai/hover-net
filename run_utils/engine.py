@@ -179,6 +179,8 @@ class RunEngine(object):
                         "step": self.state.curr_global_step,
                     },
                 ]
+
+                # training
                 step_output = self.run_step(data_batch, step_run_info)
                 self.state.step_output = step_output
 
@@ -202,4 +204,3 @@ class RunEngine(object):
             )
 
         return
-

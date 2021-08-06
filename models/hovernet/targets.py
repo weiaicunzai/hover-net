@@ -16,7 +16,7 @@ from dataloader.augs import fix_mirror_padding
 ####
 def gen_instance_hv_map(ann, crop_shape):
     """Input annotation must be of original shape.
-    
+
     The map is calculated only for instances within the crop portion
     but based on the original shape in original image.
 

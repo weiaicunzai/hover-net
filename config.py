@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 
 from dataset import get_dataset
+from models.hovernet.opt import get_config
 
 
 class Config(object):
@@ -24,13 +25,15 @@ class Config(object):
         if model_mode not in ["original", "fast"]:
             raise Exception("Must use either `original` or `fast` as model mode")
 
-        nr_type = 5 # number of nuclear types (including background)
+        #nr_type = 5 # number of nuclear types (including background)
+        nr_type = None
 
         # whether to predict the nuclear type, availability depending on dataset!
-        self.type_classification = True
+        #self.type_classification = True
+        self.type_classification = False
 
-        # shape information - 
-        # below config is for original mode. 
+        # shape information -
+        # below config is for original mode.
         # If original model mode is used, use [270,270] and [80,80] for act_shape and out_shape respectively
         # If fast model mode is used, use [256,256] and [164,164] for act_shape and out_shape respectively
         aug_shape = [540, 540] # patch shape used during augmentation (larger patch may have less border artefacts)
@@ -49,10 +52,14 @@ class Config(object):
 
         # paths to training and validation patches
         self.train_dir_list = [
-            "train_patches_path"
+            #"train_patches_path"
+            #"/data/by/tmp/hover_net/dataset/training_data/consep/consep/train/540x540_164x164"
+            "/data/smb/syh/colon_dataset/hovernet_training_data/combined/combined/train/540x540_164x164/"
         ]
         self.valid_dir_list = [
-            "valid_patches_path"
+            #"valid_patches_path"
+            #"/data/by/tmp/hover_net/dataset/training_data/consep/consep/valid/540x540_164x164"
+            "/data/smb/syh/colon_dataset/hovernet_training_data/combined/combined/valid/540x540_164x164"
         ]
 
         self.shape_info = {
@@ -63,7 +70,7 @@ class Config(object):
         # * parsing config to the running state and set up associated variables
         self.dataset = get_dataset(self.dataset_name)
 
-        module = importlib.import_module(
-            "models.%s.opt" % model_name
-        )
-        self.model_config = module.get_config(nr_type, model_mode)
+        #module = importlib.import_module(
+        #    "models.%s.opt" % model_name
+        #)
+        self.model_config = get_config(nr_type, model_mode)

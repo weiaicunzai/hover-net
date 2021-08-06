@@ -29,7 +29,8 @@ import matplotlib
 import numpy as np
 import torch
 from docopt import docopt
-from tensorboardX import SummaryWriter
+#from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 from torch.nn import DataParallel  # TODO: switch to DistributedDataParallel
 from torch.utils.data import DataLoader
 
@@ -73,7 +74,7 @@ class TrainManager(Config):
     ####
     def view_dataset(self, mode="train"):
         """
-        Manually change to plt.savefig or plt.show 
+        Manually change to plt.savefig or plt.show
         if using on headless machine or not
         """
         self.nr_gpus = 1
@@ -84,12 +85,13 @@ class TrainManager(Config):
         target_info = phase_list["target_info"]
         prep_func, prep_kwargs = target_info["viz"]
         dataloader = self._get_datagen(2, mode, target_info["gen"])
-        for batch_data in dataloader:  
+        for b_idx, batch_data in enumerate(dataloader):
             # convert from Tensor to Numpy
             batch_data = {k: v.numpy() for k, v in batch_data.items()}
             viz = prep_func(batch_data, is_batch=True, **prep_kwargs)
             plt.imshow(viz)
-            plt.show()
+            #plt.show()
+            plt.savefig('tmp/{}.jpg'.format(b_idx))
         self.nr_gpus = -1
         return
 
@@ -209,8 +211,20 @@ class TrainManager(Config):
 
                 # load_state_dict returns (missing keys, unexpected keys)
                 net_state_dict = convert_pytorch_checkpoint(net_state_dict)
+                #print(net_state_dict.keys())
+                #print(type(net_desc))
+                #print(net_desc.state_dict().keys())
+                #import sys; sys.exit()
+                #print(net_desc.conv0)
+                #for name, t in net_desc.conv0.named_parameters():
+                #    print(name, t.shape, t[0, 0])
+                #    break
                 load_feedback = net_desc.load_state_dict(net_state_dict, strict=False)
-                # * uncomment for your convenience
+                #print(net_desc.conv0)
+                #for name, t in net_desc.conv0.named_parameters():
+                #    print(name, t.shape, t[0, 0])
+                #    break
+                ## * uncomment for your convenience
                 print("Missing Variables: \n", load_feedback[0])
                 print("Detected Unknown Variables: \n", load_feedback[1])
 
@@ -239,6 +253,8 @@ class TrainManager(Config):
         # initialize runner and attach callback afterward
         # * all engine shared the same network info declaration
         runner_dict = {}
+        #print(loader_dict)
+        #import sys;  sys.exit()
         for runner_name, runner_opt in run_engine_opt.items():
             runner_dict[runner_name] = RunEngine(
                 dataloader=loader_dict[runner_name],
@@ -279,6 +295,9 @@ class TrainManager(Config):
         phase_list = self.model_config["phase_list"]
         engine_opt = self.model_config["run_engine"]
 
+        print(phase_list)
+        print('------------------------')
+        print(engine_opt)
         prev_save_path = None
         for phase_idx, phase_info in enumerate(phase_list):
             if len(phase_list) == 1:
@@ -301,5 +320,5 @@ if __name__ == "__main__":
             raise Exception('Use "train" or "valid" for --view.')
         trainer.view_dataset(args["--view"])
     else:
-        os.environ["CUDA_VISIBLE_DEVICES"] = args["--gpu"]
+        #os.environ["CUDA_VISIBLE_DEVICES"] = args["--gpu"]
         trainer.run()

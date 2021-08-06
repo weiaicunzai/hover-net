@@ -50,7 +50,7 @@ def _init_worker_child(lock_):
 ####
 def _remove_inst(inst_map, remove_id_list):
     """Remove instances with id in remove_id_list.
-    
+
     Args:
         inst_map: map of instances
         remove_id_list: list of ids to remove from inst_map
@@ -96,7 +96,7 @@ def _get_tile_info(img_shape, tile_shape, ambiguous_size=128):
         img_shape: input image shape
         tile_shape: tile shape used for post processing
         ambiguous_size: used to define area at tile boundaries
-    
+
     """
     # * get normal tiling set
     tile_grid_top_left, _ = _get_patch_top_left_info(img_shape, tile_shape, tile_shape)
@@ -303,7 +303,7 @@ class InferManager(base.InferManager):
         Args:
             patch_info_list: patch input coordinate information
             has_output_info: whether output information is given
-        
+
         """
         down_sample_ratio = self.wsi_mask.shape[0] / self.wsi_proc_shape[0]
         selected_indices = []
@@ -332,7 +332,7 @@ class InferManager(base.InferManager):
         Args:
             chunk_info_list: list of inference tile coordinate information
             patch_info_list: list of patch coordinate information
-        
+
         """
         # 1 dedicated thread just to write results back to disk
         proc_pool = Pool(processes=1)
@@ -713,15 +713,15 @@ class InferManager(base.InferManager):
 
         Args:
             run_args: arguments as defined in run_infer.py
-        
+
         """
         self._parse_args(run_args)
 
         if not os.path.exists(self.cache_path):
             rm_n_mkdir(self.cache_path)
 
-        if not os.path.exists(self.output_dir + "/json/"):
-            rm_n_mkdir(self.output_dir + "/json/")
+        #if not os.path.exists(self.output_dir + "/json/"):
+        #    rm_n_mkdir(self.output_dir + "/json/")
         if self.save_thumb:
             if not os.path.exists(self.output_dir + "/thumb/"):
                 rm_n_mkdir(self.output_dir + "/thumb/")
@@ -743,7 +743,8 @@ class InferManager(base.InferManager):
                 continue
             try:
                 log_info("Process: %s" % wsi_base_name)
-                self.process_single_file(wsi_path, msk_path, self.output_dir)
+                #self.process_single_file(wsi_path, msk_path, self.output_dir)
+                self.process_single_file(wsi_path, None, self.output_dir)
                 log_info("Finish")
             except:
                 logging.exception("Crash")

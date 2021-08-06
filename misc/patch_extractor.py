@@ -57,10 +57,10 @@ class PatchExtractor(object):
 
     def __extract_valid(self, x):
         """Extracted patches without padding, only work in case win_size > step_size.
-        
+
         Note: to deal with the remaining portions which are at the boundary a.k.a
-        those which do not fit when slide left->right, top->bottom), we flip 
-        the sliding direction then extract 1 patch starting from right / bottom edge. 
+        those which do not fit when slide left->right, top->bottom), we flip
+        the sliding direction then extract 1 patch starting from right / bottom edge.
         There will be 1 additional patch extracted at the bottom-right corner.
 
         Args:
@@ -71,6 +71,8 @@ class PatchExtractor(object):
             a list of sub patches, each patch is same dtype as x
 
         """
+
+        # x: 1376, 1376
         im_h = x.shape[0]
         im_w = x.shape[1]
 
@@ -83,6 +85,7 @@ class PatchExtractor(object):
         h_flag, h_last = extract_infos(im_h, self.win_size[0], self.step_size[0])
         w_flag, w_last = extract_infos(im_w, self.win_size[1], self.step_size[1])
 
+        #print(h_last, w_last)
         sub_patches = []
         #### Deal with valid block
         for row in range(0, h_last, self.step_size[0]):
@@ -107,7 +110,7 @@ class PatchExtractor(object):
         return sub_patches
 
     def __extract_mirror(self, x):
-        """Extracted patches with mirror padding the boundary such that the 
+        """Extracted patches with mirror padding the boundary such that the
         central region of each patch is always within the orginal (non-padded)
         image while all patches' central region cover the whole orginal image.
 
@@ -117,7 +120,7 @@ class PatchExtractor(object):
             step_size : a tuple of (h, w)
         Return:
             a list of sub patches, each patch is same dtype as x
-            
+
         """
         diff_h = self.win_size[0] - self.step_size[0]
         padt = diff_h // 2
@@ -128,13 +131,16 @@ class PatchExtractor(object):
         padr = diff_w - padl
 
         pad_type = "constant" if self.debug else "reflect"
+        #print(x.shape, 'pad before') # 1000
         x = np.lib.pad(x, ((padt, padb), (padl, padr), (0, 0)), pad_type)
+        #print(x.shape, 'pad after') # 1376
         sub_patches = self.__extract_valid(x)
         return sub_patches
 
     def extract(self, x, patch_type):
         patch_type = patch_type.lower()
         self.patch_type = patch_type
+        print(patch_type)
         if patch_type == "valid":
             return self.__extract_valid(x)
         elif patch_type == "mirror":

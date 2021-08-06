@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
@@ -44,6 +45,7 @@ def train_step(batch_data, run_info):
         "hv": true_hv,
     }
 
+    #print(model.module)
     if model.module.nr_types is not None:
         true_tp = batch_data["tp_map"]
         true_tp = torch.squeeze(true_tp).to("cuda").type(torch.int64)
@@ -56,9 +58,13 @@ def train_step(batch_data, run_info):
     model.zero_grad()  # not rnn so not accumulate
 
     pred_dict = model(imgs)
+    #print(true_np.shape, true_hv.shape)
     pred_dict = OrderedDict(
         [[k, v.permute(0, 2, 3, 1).contiguous()] for k, v in pred_dict.items()]
     )
+    #for k, v in pred_dict.items():
+    #    print(k, v.shape)
+
     pred_dict["np"] = F.softmax(pred_dict["np"], dim=-1)
     if model.module.nr_types is not None:
         pred_dict["tp"] = F.softmax(pred_dict["tp"], dim=-1)
@@ -174,6 +180,7 @@ def infer_step(batch_data, model):
     patch_imgs = batch_data
 
     patch_imgs_gpu = patch_imgs.to("cuda").type(torch.float32)  # to NCHW
+    #patch_imgs_gpu = patch_imgs.type(torch.float32)  # to NCHW
     patch_imgs_gpu = patch_imgs_gpu.permute(0, 3, 1, 2).contiguous()
 
     ####
@@ -182,16 +189,33 @@ def infer_step(batch_data, model):
     # --------------------------------------------------------------
     with torch.no_grad():  # dont compute gradient
         pred_dict = model(patch_imgs_gpu)
+        #for k, v in pred_dict.items():
+        #    print(k, v.shape)
+        # np torch.Size([8, 2, 80, 80])
+        # hv torch.Size([8, 2, 80, 80])
+
         pred_dict = OrderedDict(
             [[k, v.permute(0, 2, 3, 1).contiguous()] for k, v in pred_dict.items()]
         )
+        #for k, v in pred_dict.items():
+        #    print(k, v.shape)
+        # np torch.Size([8, 80, 80, 2])
+        # hv torch.Size([8, 80, 80, 2])
         pred_dict["np"] = F.softmax(pred_dict["np"], dim=-1)[..., 1:]
+        #for k, v in pred_dict.items():
+        #    print(k, v.shape)
+        # np torch.Size([8, 80, 80, 1])
+        # hv torch.Size([8, 80, 80, 2])
         if "tp" in pred_dict:
             type_map = F.softmax(pred_dict["tp"], dim=-1)
             type_map = torch.argmax(type_map, dim=-1, keepdim=True)
             type_map = type_map.type(torch.float32)
             pred_dict["tp"] = type_map
         pred_output = torch.cat(list(pred_dict.values()), -1)
+        #print(pred_output.shape)
+        # torch.Size([8, 80, 80, 3])
+
+        #import sys;sys.exit()
 
     # * Its up to user to define the protocol to process the raw output per step!
     return pred_output.cpu().numpy()
@@ -200,7 +224,7 @@ def infer_step(batch_data, model):
 ####
 def viz_step_output(raw_data, nr_types=None):
     """
-    `raw_data` will be implicitly provided in the similar format as the 
+    `raw_data` will be implicitly provided in the similar format as the
     return dict from train/valid step, but may have been accumulated across N running step
     """
 

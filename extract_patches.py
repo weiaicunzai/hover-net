@@ -20,7 +20,8 @@ from dataset import get_dataset
 if __name__ == "__main__":
 
     # Determines whether to extract type map (only applicable to datasets with class labels).
-    type_classification = True
+    #type_classification = True
+    type_classification = False
 
     win_size = [540, 540]
     step_size = [164, 164]
@@ -34,17 +35,22 @@ if __name__ == "__main__":
     # a dictionary to specify where the dataset path should be
     dataset_info = {
         "train": {
-            "img": (".png", "dataset/CoNSeP/Train/Images/"),
-            "ann": (".mat", "dataset/CoNSeP/Train/Labels/"),
+            #"img": (".png", "dataset/CoNSeP/Train/Images/"),
+            #"ann": (".mat", "dataset/CoNSeP/Train/Labels/"),
+            "img": (".png", "/data/by/datasets/original/CoNSep/CoNSeP/Train/Images/"),
+            "ann": (".mat", "/data/by/datasets/original/CoNSep/CoNSeP/Train/Labels/"),
         },
         "valid": {
-            "img": (".png", "dataset/CoNSeP/Test/Images/"),
-            "ann": (".mat", "dataset/CoNSeP/Test/Labels/"),
+            #"img": (".png", "dataset/CoNSeP/Test/Images/"),
+            #"ann": (".mat", "dataset/CoNSeP/Test/Labels/"),
+            "img": (".png", "/data/by/datasets/original/CoNSep/CoNSeP/Test/Images/"),
+            "ann": (".mat", "/data/by/datasets/original/CoNSep/CoNSeP/Test/Labels/"),
         },
     }
 
     patterning = lambda x: re.sub("([\[\]])", "[\\1]", x)
     parser = get_dataset(dataset_name)
+    # print(win_size, step_size, 1111) [540, 540] [164, 164] 1111
     xtractor = PatchExtractor(win_size, step_size)
     for split_name, split_desc in dataset_info.items():
         img_ext, img_dir = split_desc["img"]
@@ -71,6 +77,7 @@ if __name__ == "__main__":
 
         for file_idx, file_path in enumerate(file_list):
             base_name = pathlib.Path(file_path).stem
+            #print(file_path, base_name)
 
             img = parser.load_img("%s/%s%s" % (img_dir, base_name, img_ext))
             ann = parser.load_ann(
@@ -78,6 +85,7 @@ if __name__ == "__main__":
             )
 
             # *
+            #print(ann.shape)
             img = np.concatenate([img, ann], axis=-1)
             sub_patches = xtractor.extract(img, extract_type)
 
