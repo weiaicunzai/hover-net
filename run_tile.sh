@@ -16,7 +16,7 @@
 #--model_path='/data/by/tmp/hover_net/pretrained/hovernet_original_consep_notype_pytorch.tar' \
 #--model_path='/data/by/tmp/hover_net/logs/01/net_epoch=36.tar' \
 #--model_path='/data/by/tmp/hover_net/logs/00/net_epoch=48.tar' \
-export CUDA_VISIBLE_DEVICES=3
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 ls pretrained/hovernet_original_consep_notype_pytorch.tar
 python -u run_infer.py \
 --gpu='0' \
@@ -27,9 +27,12 @@ python -u run_infer.py \
 --nr_inference_workers=4 \
 --nr_post_proc_workers=4 \
 tile \
---input_dir='/data/smb/syh/PycharmProjects/CGC-Net/data_prostate_tcga/data/images/ZT111_4_A/' \
---output_dir='tmp' \
+--input_dir='/data/smb/syh/PycharmProjects/CGC-Net/data_baiyu/BACH/Images/' \
+--output_dir='/data/smb/syh/PycharmProjects/CGC-Net/data_baiyu/BACH/Json/' \
 --mem_usage=0.6 \
+#--input_dir='/data/smb/syh/PycharmProjects/CGC-Net/data_prostate_tcga/data/images/' \
+#--output_dir='/data/smb/syh/PycharmProjects/CGC-Net/data_prostate_tcga/data/json' \
+#--output_dir='tmp' \
 #--input_dir='/home/baiyu/tmp/hover_net/prostate_images' \
 #--input_dir='/home/baiyu/test_can_be_del3/' \
 #--output_dir='/data/smb/syh/PycharmProjects/CGC-Net/data_su/raw/Extended_CRC/mask/' \
