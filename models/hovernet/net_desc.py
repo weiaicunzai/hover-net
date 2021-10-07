@@ -19,6 +19,7 @@ class HoVerNet(Net):
         self.mode = mode
         self.freeze = freeze
         self.nr_types = nr_types
+        #print(self.nr_types, 'ffffffffffffff')
         self.output_ch = 3 if nr_types is None else 4
 
         assert mode == 'original' or mode == 'fast', \
@@ -142,7 +143,6 @@ class HoVerNet(Net):
             u0 = branch_desc[3](u1)
             out_dict[branch_name] = u0
 
-        #print(out_dict)
         return out_dict
 
 

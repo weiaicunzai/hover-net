@@ -60,10 +60,15 @@ class InferManager(object):
         """
         model_desc = import_module("models.hovernet.net_desc")
         model_creator = getattr(model_desc, "create_model")
+        #import models
+        #model_creator = models.hovernet.net_desc.create_model
 
-        print(self.method['model_args'])
+        #print(self.method['model_args'], 111111111111)
         net = model_creator(**self.method["model_args"])
+        #print(self.method['model_path'], 1111111)
+        print('loading weights from {}'.format(self.method["model_path"]))
         saved_state_dict = torch.load(self.method["model_path"])["desc"]
+        print('done')
         #saved_state_dict = torch.load(self.method["model_path"], map_location=torch.device('cpu'))["desc"]  # baiyu
         saved_state_dict = convert_pytorch_checkpoint(saved_state_dict)
 

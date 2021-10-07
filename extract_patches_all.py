@@ -121,6 +121,80 @@ class MoNuSAC:
 
         return image, mask
 
+class PanNukeEx:
+    def __init__(self, path):
+        self.images = []
+        self.masks = []
+        path = Path(path)
+        #print(os.path.join(path, '**', '*.npy'))
+        for i in glob.iglob(os.path.join(path, '**', '*.npy'), recursive=True):
+            #image_path = Path(i)
+            dirname = os.path.dirname(i)
+            basename = os.path.basename(i)
+            if os.path.basename(dirname) == 'images':
+                self.images.append(i)
+            #else:
+                basename = basename.replace('image', 'mask')
+                dirname = os.path.join(os.path.dirname(dirname), 'masks')
+                #os.path.join
+                self.masks.append(os.path.join(dirname, basename))
+                #print(os.path.join(dirname, basename), i)
+
+            #sub_path = str(image_path.relative_to(path))
+            #sub_path = sub_path.replace('images', 'masks')
+            ##sub_path = sub_path.replace('img', 'mask')
+            #sub_path = sub_path.replace('.tif', '.mat')
+            #if 'Overlay' in sub_path:
+            #    continue
+            ##print(sub_path)
+            ##mask_path = Path(os.path.join(path, sub_path))
+            #self.masks.append(os.path.join(path, sub_path))
+
+    def __len__(self):
+        return len(self.images)
+
+    def format(self, mask):
+        mask = mask[:, :, :, 0]
+        #print(mask.shape)
+        inst_map = np.zeros(mask.shape[:2])
+        type_map = np.zeros(mask.shape[:2])
+
+        n_counts = 0
+        #print(np.unique(mask[:, :, 5]))
+        for i in range(5):
+            #print(np.unique(mask[:, :, i]))
+            type_map[mask[:, :, i] != 0] = i + 1 # 0 is bg
+            n_ids = np.unique(mask[:, :, i])
+            #print(n_ids)
+            for n_id in n_ids:
+                if n_id == 0:
+                    continue
+                n_counts += 1
+                n_mask = mask[:, :, i] == n_id
+                inst_map[n_mask] = n_counts
+
+        ann = np.dstack([inst_map, type_map])
+        return ann
+
+
+    def __getitem__(self, idx):
+        image_path = self.images[idx]
+        mask_path = self.masks[idx]
+        #print(image_path, mask_path)
+        #image = cv2.imread(image_path, -1)
+        image = np.load(image_path)
+        mask = np.load(mask_path)
+
+        #mask = io.loadmat()
+        #mask = io.loadmat(mask_path)["inst_map"] #[1000, 1000]
+        mask = np.expand_dims(mask, -1)
+        mask = mask.astype("int32")
+        mask = self.format(mask)
+        #print(mask.shape)
+        #print(mask.shape, image.shape)
+
+        return image, mask
+
 class Kumar:
     def __init__(self, path):
         self.images = []
@@ -221,22 +295,25 @@ class TNBC:
     def __getitem__(self, idx):
         image_path = self.images[idx]
         mask_path = self.masks[idx]
-        print(image_path, mask_path)
-        image = cv2.imread(image_path, -1)
+        #print(image_path, mask_path)
+        #image = cv2.imread(image_path, -1)
+        image = np.load(image_path)
+        mask = np.load(mask_path)
         #mask = io.loadmat()
-        mask = io.loadmat(mask_path)["inst_map"] #[1000, 1000]
+        #mask = io.loadmat(mask_path)["inst_map"] #[1000, 1000]
         mask = np.expand_dims(mask, -1)
         mask = mask.astype("int32")
         #print(mask.shape, image.shape)
 
         return image, mask
 config = {
-    '/data/smb/syh/colon_dataset/Panuke': PanNuke,
-    '/data/smb/syh/colon_dataset/CoNSeP': CoNSeP,
-    '/data/smb/syh/colon_dataset/CPM17': CPM17,
-    '/data/smb/syh/colon_dataset/Kumar': Kumar,
-    '/data/smb/syh/colon_dataset/MoNuSAC': MoNuSAC,
-    '/data/smb/syh/colon_dataset/TNBC': TNBC,
+    #'/data/smb/syh/colon_dataset/Panuke': PanNuke,
+    #'/data/smb/syh/colon_dataset/CoNSeP': CoNSeP,
+    #'/data/smb/syh/colon_dataset/CPM17': CPM17,
+    #'/data/smb/syh/colon_dataset/Kumar': Kumar,
+    #'/data/smb/syh/colon_dataset/MoNuSAC': MoNuSAC,
+    #'/data/smb/syh/colon_dataset/TNBC': TNBC,
+    '/data/smb/syh/colon_dataset/PanukeEx/split_witytypes/': PanNukeEx,
 }
 
 class ComBinedFactory:
@@ -336,9 +413,33 @@ combined = ComBinedFactory(config)
 # -------------------------------------------------------------------------------------
 if __name__ == "__main__":
 
+
+    #datasets = PanNukeEx('/data/smb/syh/colon_dataset/PanukeEx/split_witytypes/')
+    #image, mask = datasets[131]
+    #count = 0
+    ##for image, mask in datasets:
+    #    #count = np.unique(mask)
+    #count += mask.max()
+
+    #cv2.imwrite('ttt.jpg', image)
+    #type_map = mask[:, :, 1]
+    #inst_map = mask[:, :, 0]
+    #print(np.unique(mask))
+    ##image_tmp = image.copy()
+    #image[type_map != 0] = 255
+    #print(inst_map.max(), inst_map.min())
+    #print(inst_map)
+    #inst_map = inst_map / (inst_map.max() + 1e-8) * 255
+    #cv2.imwrite('ttt1.jpg', image)
+    #cv2.imwrite('ttt2.jpg', inst_map)
+
+    ##print(count)
+    #import sys; sys.exit()
+
+
     # Determines whether to extract type map (only applicable to datasets with class labels).
-    #type_classification = True
-    type_classification = False
+    type_classification = True
+    #type_classification = False
 
     win_size = [540, 540]
     step_size = [164, 164]
@@ -346,10 +447,10 @@ if __name__ == "__main__":
 
     # Name of dataset - use Kumar, CPM17 or CoNSeP.
     # This used to get the specific dataset img and ann loading scheme from dataset.py
-    dataset_name = "combined"
+    dataset_name = "PanNukeEx"
     #save_root = "dataset/training_data/%s/" % dataset_name
     save_root = "/data/smb/syh/colon_dataset/hovernet_training_data/%s/" % dataset_name
-    combined_train, combined_test = combined.split_train_valid([0.9, 0.1])
+    combined_train, combined_test = combined.split_train_valid([0.95, 0.05])
 
     # a dictionary to specify where the dataset path should be
     dataset_info = {
@@ -378,15 +479,27 @@ if __name__ == "__main__":
         #img_ext, img_dir = split_desc["img"]
         #ann_ext, ann_dir = split_desc["ann"]
 
-        out_dir = "%s/%s/%s/%dx%d_%dx%d/" % (
+        #out_dir = "%s/%s/%s/%dx%d_%dx%d/" % (
+        #    save_root,
+        #    dataset_name,
+        #    split_name,
+        #    win_size[0],
+        #    win_size[1],
+        #    step_size[0],
+        #    step_size[1],
+        #)
+
+        out_dir = os.path.join(
             save_root,
             dataset_name,
             split_name,
+            '{}x{}_{}x{}'.format(
             win_size[0],
             win_size[1],
             step_size[0],
-            step_size[1],
+            step_size[1])
         )
+
         #file_list = glob.glob(patterning("%s/*%s" % (ann_dir, ann_ext)))
         #file_list.sort()  # ensure same ordering across platform
 
@@ -423,7 +536,11 @@ if __name__ == "__main__":
             )
 
             for idx, patch in enumerate(sub_patches):
-                np.save("{0}/{1}_{2:03d}.npy".format(out_dir, base_name, idx), patch)
+                os.makedirs(out_dir, exist_ok=True)
+                np_save_path = os.path.join(out_dir, '{}_{:03d}.npy'.format(base_name, idx))
+                #np.save("{0}/{1}_{2:03d}.npy".format(out_dir, base_name, idx), patch)
+                #print(np_save_path)
+                np.save(np_save_path, patch)
                 pbar.update()
             pbar.close()
             # *

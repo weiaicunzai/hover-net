@@ -55,13 +55,18 @@ def get_config(nr_type, mode):
                         # None to start from scratch
                         #"pretrained": "../pretrained/ImageNet-ResNet50-Preact_pytorch.tar",
                         #"pretrained": "/data/by/tmp/hover_net/pretrained/ImageNet-ResNet50-Preact_pytorch.tar",
-                        "pretrained": "pretrained/hovernet_original_consep_notype_pytorch.tar",
+                        #"pretrained": "pretrained/hovernet_original_consep_notype_pytorch.tar",
+                        #"pretrained": "/data/smb/syh/PycharmProjects/CGC-Net/data_baiyu/HoverNet/net_epoch=36.tar",
+                        "pretrained": "/data/smb/syh/PycharmProjects/CGC-Net/data_baiyu/HoverNet/combined_notypes/net_epoch=36.tar",
                         # 'pretrained': None,
                     },
                 },
                 "target_info": {"gen": (gen_targets, {}), "viz": (prep_sample, {})},
-                "batch_size": {"train": 4, "valid": 4,},  # engine name : value
+                #"batch_size": {"train": 4, "valid": 4,},  # engine name : value
+                "batch_size": {"train": 32, "valid": 32,},  # engine name : value
                 "nr_epochs": 50,
+                #"nr_epochs": 25,
+                #"nr_epochs": 25,
             },
             {
                 "run_info": {
@@ -90,11 +95,15 @@ def get_config(nr_type, mode):
                         # path to load, -1 to auto load checkpoint from previous phase,
                         # None to start from scratch
                         "pretrained": -1,
+                        #"pretrained": None,
+
                     },
                 },
                 "target_info": {"gen": (gen_targets, {}), "viz": (prep_sample, {})},
-                "batch_size": {"train": 4, "valid": 8,}, # batch size per gpu
+                #"batch_size": {"train": 4, "valid": 8,}, # batch size per gpu
+                "batch_size": {"train": 10, "valid": 10,}, # batch size per gpu
                 "nr_epochs": 50,
+                #"nr_epochs": 25,
             },
         ],
         # ------------------------------------------------------------------

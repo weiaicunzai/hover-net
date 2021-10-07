@@ -46,7 +46,7 @@ def vis(img_fp, json_fp):
             #image = cv2.rectangle()
 
 
-    image = cv2.resize(image, (0, 0), fx=0.3, fy=0.3)
+    image = cv2.resize(image, (0, 0), fx=0.7, fy=0.7)
     cv2.imwrite('test_448_single_process.jpg', image)
 
 
@@ -64,7 +64,7 @@ def draw(img_fp, coord):
 def json2image(image_folder, json_path):
     json_basename = os.path.basename(json_path)
     json_prefix = json_basename.split('.')[0]
-    for i in glob.iglob(os.path.join(image_folder, '**', '*.tif'), recursive=True):
+    for i in glob.iglob(os.path.join(image_folder, '**', '*.png'), recursive=True):
         if json_prefix in i:
             return i
 
@@ -93,6 +93,8 @@ if __name__ == '__main__':
     c = '/data/smb/syh/tmp/'
     p = '/data/smb/syh/PycharmProjects/CGC-Net/data_baiyu/BACH/Images_Aug/'
     c = '/data/smb/syh/PycharmProjects/CGC-Net/data_baiyu/BACH/Json_Aug/'
+    p = '/data/smb/syh/PycharmProjects/CGC-Net/data_baiyu/CRC/SliceImage/'
+    c = '/data/smb/syh/PycharmProjects/CGC-Net/data_baiyu/CRC/Json/SliceJson/json/'
 
 
     jsons = glob.glob(os.path.join(c, '**', '*.json'), recursive=True)

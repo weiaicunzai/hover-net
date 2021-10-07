@@ -140,7 +140,7 @@ class PatchExtractor(object):
     def extract(self, x, patch_type):
         patch_type = patch_type.lower()
         self.patch_type = patch_type
-        print(patch_type)
+        #print(patch_type)
         if patch_type == "valid":
             return self.__extract_valid(x)
         elif patch_type == "mirror":

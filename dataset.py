@@ -61,6 +61,9 @@ class __CPM17(__AbstractDataset):
         ann = np.expand_dims(ann_inst, -1)
         return ann
 
+#class __PanNukeEx(__AbstractDataset):
+
+
 
 ####
 class __CoNSeP(__AbstractDataset):
@@ -102,6 +105,7 @@ def get_dataset(name):
         "kumar": lambda: __Kumar(),
         "cpm17": lambda: __CPM17(),
         "consep": lambda: __CoNSeP(),
+        "pannukeex": lambda: __CoNSeP(),
     }
     if name.lower() in name_dict:
         return name_dict[name]()

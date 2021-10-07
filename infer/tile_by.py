@@ -125,9 +125,9 @@ class ExtendedCRC(data.Dataset):
     def __init__(self, path, win_size, msk_size, return_src_top_corner):
         self.image_names = []
 
-        pp = '/data/smb/syh/PycharmProjects/CGC-Net/data_su/raw/Extended_CRC/mask/json/'
+        #pp = '/data/smb/syh/PycharmProjects/CGC-Net/data_su/raw/Extended_CRC/mask/json/'
         #json_lists = set([i.split('.')[0] for i in os.listdir(pp)])
-        json_lists = set([i.split('.')[0] for i in os.listdir(pp)])
+        #json_lists = set([i.split('.')[0] for i in os.listdir(pp)])
         #print(json_lists[3])
         #sys.exit()
         #print(len(json_lists))
@@ -135,11 +135,11 @@ class ExtendedCRC(data.Dataset):
         for path in glob.iglob(os.path.join(path, '**', '*.png'), recursive=True):
             p = os.path.basename(path).split('.')[0]
             #print(p, json_lists)
-            if p not in json_lists:
+            #if p not in json_lists:
                 #print(path)
 
 
-                self.image_names.append(path)
+            self.image_names.append(path)
 
         #print(len(self.image_names))
         #sys.exit()
@@ -152,8 +152,9 @@ class ExtendedCRC(data.Dataset):
 
     def __getitem__(self, idx):
         path = self.image_names[idx]
-        image = cv2.imread(path, -1)
-        image = cv2.resize(image, (0, 0), fx=2, fy=2)
+        #image = cv2.imread(path, -1)
+        image = cv2.imread(path)
+        #image = cv2.resize(image, (0, 0), fx=2, fy=2)
         src_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         #return sub_patches, nr_step_h, nr_step_w, im_h, im_w
         #sub_images, nr_step, src_shape
@@ -168,9 +169,55 @@ class ExtendedCRC(data.Dataset):
 #class Prostate(data.Dataset):
 #    def __init__(self, path, win_)
 
+#class BACH(data.Dataset):
+#    def __init__(self, path, win_size, msk_size, return_src_top_corner):
+#        self.image_names = []
+#
+#        #pp = '/data/smb/syh/PycharmProjects/CGC-Net/data_su/raw/Extended_CRC/mask/json/'
+#        ##json_lists = set([i.split('.')[0] for i in os.listdir(pp)])
+#        #json_lists = set([i.split('.')[0] for i in os.listdir(pp)])
+#        #print(json_lists[3])
+#        #sys.exit()
+#        #print(len(json_lists))
+#        #sys.exit()
+#        #for path in glob.iglob(os.path.join(path, '**', '*.png'), recursive=True):
+#        for img_fp in glob.iglob(os.path.join(path, '**', '*.tif'), recursive=True):
+#            #p = os.path.basename(img_fp).split('.')[0]
+#            #print(p, json_lists)
+#            #if p not in json_lists:
+#                #print(path)
+#            self.image_names.append(img_fp)
+#
+#        #print(len(self.image_names))
+#        #sys.exit()
+#        self.win_size = win_size
+#        self.msk_size = msk_size
+#        self.return_src_top_corner = return_src_top_corner
+#
+#    def __len__(self):
+#        return len(self.image_names)
+#
+#    def __getitem__(self, idx):
+#        path = self.image_names[idx]
+#        image = cv2.imread(path, -1)
+#        #image = cv2.resize(image, (0, 0), fx=2, fy=2)
+#        src_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype('uint8')
+#        #src_image = cv2.resize(src_image, (0, 0), fx=2, fy=2)
+#        #print(src_image.shape, src_image.dtype, src_image.max())
+#        #print(src_image.shape, src_image.dtype, src_image.astype('uint8').max())
+#        #sub_images, nr_step, src_shape = _prepare_patching(src_image, self.win_size, self.msk_size, self.return_src_top_corner)
+#        #return  np.array(sub_images), nr_step_h, nr_step_w, im_h, im_w, path
+#
+#        sub_images, nr_step_h, nr_step_w, im_h, im_w = _prepare_patching(src_image, self.win_size, self.msk_size, self.return_src_top_corner)
+#
+#        #return  np.array(sub_images), nr_step, src_shape, path
+#        return  np.array(sub_images), nr_step_h, nr_step_w, im_h, im_w, path
+
+
 class BACH(data.Dataset):
     def __init__(self, path, win_size, msk_size, return_src_top_corner):
         self.image_names = []
+        #self.images = []
 
         #pp = '/data/smb/syh/PycharmProjects/CGC-Net/data_su/raw/Extended_CRC/mask/json/'
         ##json_lists = set([i.split('.')[0] for i in os.listdir(pp)])
@@ -180,13 +227,17 @@ class BACH(data.Dataset):
         #print(len(json_lists))
         #sys.exit()
         #for path in glob.iglob(os.path.join(path, '**', '*.png'), recursive=True):
+        #print('loading  images into memory....')
+        #for img_fp in glob.iglob(os.path.join(path, '**', '*.jpg'), recursive=True):
         for img_fp in glob.iglob(os.path.join(path, '**', '*.tif'), recursive=True):
             #p = os.path.basename(img_fp).split('.')[0]
             #print(p, json_lists)
             #if p not in json_lists:
                 #print(path)
             self.image_names.append(img_fp)
+            #self.images.append(cv2.imread(img_fp, -1))
 
+        #print('done')
         #print(len(self.image_names))
         #sys.exit()
         self.win_size = win_size
@@ -198,15 +249,13 @@ class BACH(data.Dataset):
 
     def __getitem__(self, idx):
         path = self.image_names[idx]
-        image = cv2.imread(path, -1)
+        image = cv2.imread(path)
+        #if not image :
+            #print(path)
+        #image = self.images[idx]
         #image = cv2.resize(image, (0, 0), fx=2, fy=2)
-        src_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype('uint8')
-        #src_image = cv2.resize(src_image, (0, 0), fx=2, fy=2)
-        #print(src_image.shape, src_image.dtype, src_image.max())
-        #print(src_image.shape, src_image.dtype, src_image.astype('uint8').max())
+        src_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         #sub_images, nr_step, src_shape = _prepare_patching(src_image, self.win_size, self.msk_size, self.return_src_top_corner)
-        #return  np.array(sub_images), nr_step_h, nr_step_w, im_h, im_w, path
-
         sub_images, nr_step_h, nr_step_w, im_h, im_w = _prepare_patching(src_image, self.win_size, self.msk_size, self.return_src_top_corner)
 
         #return  np.array(sub_images), nr_step, src_shape, path
@@ -215,6 +264,7 @@ class BACH(data.Dataset):
 class Prostate(data.Dataset):
     def __init__(self, path, win_size, msk_size, return_src_top_corner):
         self.image_names = []
+        #self.images = []
 
         #pp = '/data/smb/syh/PycharmProjects/CGC-Net/data_su/raw/Extended_CRC/mask/json/'
         ##json_lists = set([i.split('.')[0] for i in os.listdir(pp)])
@@ -224,13 +274,17 @@ class Prostate(data.Dataset):
         #print(len(json_lists))
         #sys.exit()
         #for path in glob.iglob(os.path.join(path, '**', '*.png'), recursive=True):
-        for img_fp in glob.iglob(os.path.join(path, '**', '*.jpg'), recursive=True):
+        print('loading  images into memory....')
+        #for img_fp in glob.iglob(os.path.join(path, '**', '*.jpg'), recursive=True):
+        for img_fp in glob.iglob(os.path.join(path, '**', '*.png'), recursive=True):
             #p = os.path.basename(img_fp).split('.')[0]
             #print(p, json_lists)
             #if p not in json_lists:
                 #print(path)
             self.image_names.append(img_fp)
+            #self.images.append(cv2.imread(img_fp, -1))
 
+        print('done')
         #print(len(self.image_names))
         #sys.exit()
         self.win_size = win_size
@@ -243,11 +297,14 @@ class Prostate(data.Dataset):
     def __getitem__(self, idx):
         path = self.image_names[idx]
         image = cv2.imread(path, -1)
+        #image = self.images[idx]
         #image = cv2.resize(image, (0, 0), fx=2, fy=2)
         src_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        sub_images, nr_step, src_shape = _prepare_patching(src_image, self.win_size, self.msk_size, self.return_src_top_corner)
+        #sub_images, nr_step, src_shape = _prepare_patching(src_image, self.win_size, self.msk_size, self.return_src_top_corner)
+        sub_images, nr_step_h, nr_step_w, im_h, im_w = _prepare_patching(src_image, self.win_size, self.msk_size, self.return_src_top_corner)
 
-        return  np.array(sub_images), nr_step, src_shape, path
+        #return  np.array(sub_images), nr_step, src_shape, path
+        return  np.array(sub_images), nr_step_h, nr_step_w, im_h, im_w, path
 
 class InferManager(base.InferManager):
     """Run inference on tiles."""
@@ -275,9 +332,10 @@ class InferManager(base.InferManager):
 
             return pred_map
 
-        #dataset = ExtendedCRC(
+        print(self.input_dir)
+        dataset = ExtendedCRC(
         #dataset = Prostate(
-        dataset = BACH(
+        #dataset = BACH(
             path=self.input_dir,
             win_size=self.patch_input_shape,
             msk_size=self.patch_output_shape,
@@ -290,9 +348,10 @@ class InferManager(base.InferManager):
         print('dataset size', len(dataset))
         dataloader = data.DataLoader(
             dataset,
-            num_workers=self.nr_inference_workers,
-            batch_size=2,
-            #batch_size=3,
+            #num_workers=self.nr_inference_workers,
+            num_workers=2,
+            #batch_size=2,
+            batch_size=1,
             drop_last=False,
         )
 
@@ -380,8 +439,9 @@ class InferManager(base.InferManager):
                 #print(image.shape)
             #count += 1
             print('iter/total [{}/{}], average speed: {:4f}s'.format(
-                    idx * self.batch_size + len(path),
+                    #idx * self.batch_size + len(path),
+                    idx * 3 + len(path),
                     len(dataset),
-                    (idx * self.batch_size + len(path)) / (time.time() - start))
+                    (idx * 3 + len(path)) / (time.time() - start))
                 )
                 #sys.exit()

@@ -183,6 +183,7 @@ class TrainManager(Config):
             assert inspect.isclass(net_info["desc"]) or inspect.isfunction(
                 net_info["desc"]
             ), "`desc` must be a Class or Function which instantiate NEW objects !!!"
+            #print(net_info['desc'], 11111)
             net_desc = net_info["desc"]()
 
             # TODO: customize print-out for each run ?
@@ -202,6 +203,7 @@ class TrainManager(Config):
                             k: torch.from_numpy(v) for k, v in net_state_dict.items()
                         }
                     elif chkpt_ext == "tar":  # ! assume same saving format we desire
+                        #print(pretrained_path, 1111)
                         net_state_dict = torch.load(pretrained_path)["desc"]
 
                 colored_word = colored(net_name, color="red", attrs=["bold"])
@@ -300,6 +302,7 @@ class TrainManager(Config):
         print(engine_opt)
         prev_save_path = None
         for phase_idx, phase_info in enumerate(phase_list):
+            #print(phase_idx, 2222222222)
             if len(phase_list) == 1:
                 save_path = self.log_dir
             else:
